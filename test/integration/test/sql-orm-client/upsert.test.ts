@@ -175,7 +175,8 @@ describe('integration/upsert', () => {
         if (!isInsertAst(insertPlanAst)) {
           throw new Error('Expected first empty-update upsert execution to emit an insert AST');
         }
-        expect(insertPlanAst.onConflict?.action?.kind).toBe('do-nothing');
+        expect(insertPlanAst.onConflict?.action?.kind).toBe('do-update-set');
+        expect(runtime.executions).toHaveLength(1);
 
         runtime.resetExecutions();
         const existing = await users.upsert({
@@ -195,7 +196,8 @@ describe('integration/upsert', () => {
         if (!isInsertAst(conflictPlanAst)) {
           throw new Error('Expected second empty-update upsert execution to emit an insert AST');
         }
-        expect(conflictPlanAst.onConflict?.action?.kind).toBe('do-nothing');
+        expect(conflictPlanAst.onConflict?.action?.kind).toBe('do-update-set');
+        expect(runtime.executions).toHaveLength(1);
 
         expect(await users.first({ id: 1 })).toEqual({
           id: 1,
